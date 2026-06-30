@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>hy · 경력입사 전략 & 보상 대시보드</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c232d; --border:#2a323c;
+    --text:#e6edf3; --muted:#9aa7b4; --accent:#58a6ff; --accent2:#3fb950;
+    --warn:#d29922; --danger:#f85149; --chip:#21262d;
+    --grad:linear-gradient(135deg,#1f6feb 0%,#3fb950 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",Roboto,"Malgun Gothic",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
+  header.top{display:flex;flex-direction:column;gap:8px;padding:28px 0 18px;border-bottom:1px solid var(--border)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:42px;height:42px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:#fff;letter-spacing:-1px}
+  h1{font-size:22px;font-weight:700;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:13.5px}
+  .updated{color:var(--muted);font-size:12px;margin-top:2px}
+  .tabs{display:flex;gap:8px;margin:22px 0 26px;flex-wrap:wrap}
+  .tab{background:var(--panel);border:1px solid var(--border);color:var(--muted);padding:10px 18px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;transition:.15s}
+  .tab:hover{color:var(--text);border-color:var(--accent)}
+  .tab.active{background:var(--grad);color:#fff;border-color:transparent}
+  section.view{display:none;animation:fade .25s ease}
+  section.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:860px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 18px}
+  .card h3{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;font-weight:700}
+  .kpi{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .kpi small{font-size:13px;font-weight:600;color:var(--muted)}
+  .kpi.green{color:var(--accent2)} .kpi.blue{color:var(--accent)} .kpi.warn{color:var(--warn)}
+  .note{font-size:12px;color:var(--muted);margin-top:6px}
+  h2.sec{font-size:18px;margin:28px 0 14px;font-weight:700;display:flex;align-items:center;gap:8px}
+  h2.sec::before{content:"";width:4px;height:18px;background:var(--grad);border-radius:3px;display:inline-block}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  tr:last-child td{border-bottom:none}
+  .tbl-wrap{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:700;background:var(--chip);border:1px solid var(--border)}
+  .c-hi{color:var(--accent2);border-color:#23502f;background:#0f2417}
+  .c-mid{color:var(--warn);border-color:#5a4612;background:#241d08}
+  .c-lo{color:var(--danger);border-color:#5a2420;background:#240f0e}
+  .c-blue{color:var(--accent);border-color:#1d3a5c;background:#0d1d30}
+  .bar{height:8px;border-radius:6px;background:var(--panel2);overflow:hidden;margin-top:6px}
+  .bar > span{display:block;height:100%;border-radius:6px;background:var(--grad)}
+  ul.clean{list-style:none;display:flex;flex-direction:column;gap:7px}
+  ul.clean li{padding-left:18px;position:relative;font-size:13.5px}
+  ul.clean li::before{content:"▹";position:absolute;left:0;color:var(--accent)}
+  .quote{border-left:3px solid var(--accent);background:var(--panel2);padding:11px 14px;border-radius:0 8px 8px 0;font-size:13.5px;color:var(--text);margin-top:8px}
+  .pill-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+  .pill{background:var(--chip);border:1px solid var(--border);padding:4px 11px;border-radius:999px;font-size:12.5px;color:var(--muted)}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:860px){.twocol{grid-template-columns:1fr}}
+  .banner{background:linear-gradient(135deg,#1a2733,#141a21);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px}
+  .banner b{color:var(--accent2)}
+  .disclaimer{font-size:12px;color:var(--muted);background:#241d08;border:1px solid #5a4612;border-radius:10px;padding:11px 14px;margin-top:10px}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;text-align:center}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:4px 0 14px}
+  .legend span b{font-weight:700}
+  .strat-track{border-radius:14px;border:1px solid var(--border);padding:18px;background:var(--panel)}
+  .strat-track.A{border-top:3px solid var(--accent2)}
+  .strat-track.B{border-top:3px solid var(--accent)}
+  .strat-track h4{font-size:15px;margin-bottom:4px}
+  .strat-track .tag{font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+  .A .tag{color:var(--accent2)} .B .tag{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo">hy</div>
+      <div>
+        <h1>hy · 경력입사 전략 &amp; 보상 대시보드</h1>
+        <div class="sub">반도체 경력 채용 지원 전략 · 보상/복지 분석 · <em>회사명은 <b>hy</b>로 마스킹 표기</em></div>
+      </div>
+    </div>
+    <div class="updated">기준일 2026-06-30 · 보상 수치는 언론/커뮤니티 추정치 기반(비공식)</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-v="strategy">① 경력입사 전략</button>
+    <button class="tab" data-v="comp">② 복지 · 급여 혜택</button>
+  </div>
+
+  <!-- ============ STRATEGY ============ -->
+  <section class="view active" id="strategy">
+
+    <div class="banner">
+      핵심 포지셔닝 — <b>“디스플레이 개발자”가 아니라</b> 미세소자 공정 · 이종소재 접합/계면 · 신뢰성 · 데이터 분석을 통합해
+      <b>구조불량과 공정 window 문제를 해결해 온 엔지니어</b>로 써야 합격 가능성이 올라간다.
+    </div>
+
+    <div class="grid g4">
+      <div class="card"><h3>전공 기반</h3><div class="kpi blue">화학 석사</div><div class="note">성균관대 · 재료/화학 이해</div></div>
+      <div class="card"><h3>핵심 경력</h3><div class="kpi">Micro/Nano LED</div><div class="note">공정개발 · 패널 구현</div></div>
+      <div class="card"><h3>차별화 역량</h3><div class="kpi green">접합·신뢰성</div><div class="note">계면 · 불량 메커니즘 분석</div></div>
+      <div class="card"><h3>보조 무기</h3><div class="kpi warn">데이터/AI</div><div class="note">Python/R · 자동화 · 해석</div></div>
+    </div>
+
+    <h2 class="sec">지원 직무 적합도 랭킹</h2>
+    <div class="legend">
+      <span><b>합격가능성</b> = 경력 정합성 · 유효경쟁자 희소성</span>
+      <span><b>근무강도</b> <span class="chip c-hi">낮음</span> <span class="chip c-mid">중</span> <span class="chip c-lo">높음</span></span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>순위</th><th>직무</th><th>한 줄 정의</th><th>합격가능성</th><th>근무강도</th><th>메모</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><b>Digital Factory / AI·DT</b></td><td>제조현장을 AI·DX·자동화 시스템으로 전환</td>
+            <td><div class="bar"><span style="width:78%"></span></div></td><td><span class="chip c-mid">중상</span></td>
+            <td>제조 도메인+AI 자동화+리딩으로 차별화 용이. <i>단, AI/데이터 성과 2~3개 증빙 필요</i></td></tr>
+          <tr><td>2</td><td><b>Process Integration</b></td><td>전체 공정을 연결해 수율·불량·품질을 잡는 종합 컨트롤타워</td>
+            <td><div class="bar"><span style="width:85%"></span></div></td><td><span class="chip c-lo">높음</span></td>
+            <td>경력 정합성 최고. <i>합격 최우선이면 1순위, 단 야근·긴급이슈 대응 큼</i></td></tr>
+          <tr><td>3</td><td><b>Device / TCAD · Simulation</b></td><td>소자·구조의 열·기계 stress, warpage를 해석</td>
+            <td><div class="bar"><span style="width:60%"></span></div></td><td><span class="chip c-mid">중~중상</span></td>
+            <td>FEM/열·기계 해석 경험 연결. <i>정통 TCAD/DFT/MD 경험자가 강력 경쟁자</i></td></tr>
+          <tr><td>4</td><td><b>소재기술 / Patterning 소재</b></td><td>Litho용 PR·Interlayer 소재 개발</td>
+            <td><div class="bar"><span style="width:52%"></span></div></td><td><span class="chip c-hi">중(낮은편)</span></td>
+            <td>근무강도 매력적이나 <i>PR/EUV·PAG·quencher 직접경험자와 정면승부 불리</i></td></tr>
+          <tr><td>5</td><td><b>Data Science</b></td><td>장비·공정 데이터로 예측·자동화 모델 구축</td>
+            <td><div class="bar"><span style="width:48%"></span></div></td><td><span class="chip c-mid">중상</span></td>
+            <td>방향성 좋음. <i>ML/DL 제조적용·5년+·MLOps 요건이 날카로움</i></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="sec">두 갈래 전략</h2>
+    <div class="twocol">
+      <div class="strat-track A">
+        <div class="tag">Track A · 합격 가능성 최우선</div>
+        <h4>Process Integration 정조준</h4>
+        <ul class="clean">
+          <li>경력을 가장 자연스럽게 연결, 반도체 핵심 직무</li>
+          <li>커리어 확장성 최고</li>
+          <li>단점: 근무강도·야근·긴급 라인이슈 대응 큼</li>
+        </ul>
+        <div class="quote">미세소자 공정·접합·계면·신뢰성·데이터를 통합해 구조불량과 공정 window 문제를 해결해 온 <b>공정통합 엔지니어</b></div>
+      </div>
+      <div class="strat-track B">
+        <div class="tag">Track B · 근무강도/워라밸 고려</div>
+        <h4>Digital Factory / AI·DT 우선</h4>
+        <ul class="clean">
+          <li>긴급 라인 대응 가능성 상대적으로 낮음</li>
+          <li>AI 자동화 관심·해석/시뮬레이션 경험과 연결</li>
+          <li>전제: 회사 업무 AI/데이터 성과를 구체적으로 서술 가능해야</li>
+        </ul>
+        <div class="quote">제조 도메인을 이해하고 데이터·AI·시뮬레이션으로 문제해결 체계를 고도화하는 <b>제조 DX형 R&amp;D 엔지니어</b></div>
+      </div>
+    </div>
+
+    <h2 class="sec">직무 선택 결정 질문</h2>
+    <div class="grid g2">
+      <div class="card"><h3>Q1 · AI/데이터 성과</h3>회사 업무에서 Python/R/AI/자동화/데이터 분석으로 <b>실제 성과 2~3개</b>를 쓸 수 있는가?
+        <div class="note">Yes → Digital Factory / Data Science 가치↑</div></div>
+      <div class="card"><h3>Q2 · PR 소재 경험</h3>PR/Photo Resist/고분자/PAG/Quencher/EUV Resist <b>직접 경험</b>이 있는가?
+        <div class="note">No → Patterning 소재는 직접경험자 대비 불리</div></div>
+      <div class="card"><h3>Q3 · 해석툴 실무</h3>TCAD/Sentaurus/Silvaco/COMSOL/ANSYS/Fluent <b>실무</b> 경험이 있는가?
+        <div class="note">Yes → Device·TCAD 가치↑</div></div>
+      <div class="card"><h3>Q4 · 우선순위</h3>근무강도보다 <b>입사 자체</b>가 우선인가?
+        <div class="note">Yes → Process Integration 우선 / No → Track B</div></div>
+    </div>
+
+    <h2 class="sec">직무별 핵심 메시지(지원서 일관 메시지)</h2>
+    <div class="grid g2">
+      <div class="card"><h3>Process Integration</h3>차세대 미세소자 공정에서 공정조건·이종소재 접합·전기/광학 특성·신뢰성 데이터를 통합 분석해 불량 메커니즘을 규명하고 개선방향을 도출한 경험.</div>
+      <div class="card"><h3>Digital Factory / AI·DT</h3>제조 도메인 지식과 데이터/AI 역량으로 반복 분석·보고·원인규명·의사결정 과정을 자동화·고도화.</div>
+      <div class="card"><h3>Device · TCAD</h3>미세소자·패널 구조의 열·기계 stress, warpage, bending/buckling을 해석하고 공정/소자/신뢰성 데이터와 연계해 설계 개선방향 도출.</div>
+      <div class="card"><h3>Patterning 소재</h3>화학/재료 기반으로 소재·계면·접합 구조와 신뢰성 특성을 분석, 소재 특성과 공정 결과 간 인과관계를 해석하는 역량.</div>
+    </div>
+
+    <h2 class="sec">자기소개서 빠른 점검</h2>
+    <div class="twocol">
+      <div class="card"><h3 style="color:var(--accent2)">넣어야 할 키워드</h3>
+        <div class="pill-row">
+          <span class="pill">차세대 미세소자</span><span class="pill">공정 통합</span><span class="pill">이종 소재 접합</span>
+          <span class="pill">계면 특성</span><span class="pill">구조 불량</span><span class="pill">신뢰성</span>
+          <span class="pill">수율/품질 데이터</span><span class="pill">Process Window</span><span class="pill">메모리 제조 경쟁력</span>
+        </div></div>
+      <div class="card"><h3 style="color:var(--danger)">피해야 할 표현</h3>
+        <ul class="clean">
+          <li>현재 회사의 성장성이 낮아서</li>
+          <li>디스플레이 산업이 어려워서</li>
+          <li>연봉/복지가 좋아서</li>
+          <li>“새로운 도전을 위해”만 반복</li>
+        </ul></div>
+    </div>
+
+  </section>
+
+  <!-- ============ COMPENSATION ============ -->
+  <section class="view" id="comp">
+
+    <div class="banner">
+      보상 구조 핵심 — 연봉 = <b>기본급(고정) + PS + PI + 기타</b>.
+      <b>변동급(PS+PI) 비중이 약 60%↑</b>로, 부서/직무 차이보다 <b>회사 영업이익(반도체 사이클)</b>이 보상의 최대 변수다.
+    </div>
+
+    <div class="grid g4">
+      <div class="card"><h3>PS 재원</h3><div class="kpi green">영업이익 10%</div><div class="note">초과이익분배금 · 연 1회</div></div>
+      <div class="card"><h3>PI 상한</h3><div class="kpi blue">월 기본급 150%</div><div class="note">영업이익률 30%↑ 시 · 반기</div></div>
+      <div class="card"><h3>최근 PS 지급률</h3><div class="kpi">2,964%</div><div class="note">연봉 1억 → PS만 약 1.48억</div></div>
+      <div class="card"><h3>변동급 비중</h3><div class="kpi warn">≈ 60%+</div><div class="note">호황엔 폭발 · 불황엔 수축</div></div>
+    </div>
+
+    <h2 class="sec">보상 구성요소</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>구성</th><th>정체</th><th>주기</th><th>기준 / 재원</th></tr></thead>
+        <tbody>
+          <tr><td><b>기본급</b></td><td>고정급여</td><td>매월</td><td>직급별 책정</td></tr>
+          <tr><td><b>PS</b> (초과이익분배금)</td><td>연 1회 대형 성과급</td><td>연 1회</td><td><span class="chip c-hi">전년 영업이익 10%</span> · 상한 1,000% 폐지</td></tr>
+          <tr><td><b>PI</b> (생산성격려금)</td><td>반기 성과급</td><td>상·하반기</td><td>월 기본급 최대 150%</td></tr>
+          <tr><td>기타</td><td>명절/복지성</td><td>수시</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="disclaimer">⚠ <b>이연 지급 구조</b> — PS의 80%는 당해 지급, 20%는 2년에 걸쳐(매년 10%) 이연. 입사 첫해는 만수령까지 시차가 있음. 성과급 일부를 퇴직연금(DC형)으로 적립 선택하는 제도 도입 추진 중.</div>
+
+    <h2 class="sec">직급별 연봉 (호황 사이클 정점 기준 · 추정)</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>구분</th><th>총 연봉(추정)</th><th>기본급</th><th>PS</th><th>PI</th><th>기타</th></tr></thead>
+        <tbody>
+          <tr><td>신입(대졸)</td><td><b>≈ 1.45억</b></td><td>5,300만</td><td>8,000만</td><td>800만</td><td>400만</td></tr>
+          <tr><td>과장(TL)</td><td><b>≈ 2.17억</b></td><td>8,000만</td><td>1.2억</td><td>1,200만</td><td>500만</td></tr>
+          <tr><td>부장 초임</td><td><b>≈ 2.71억</b></td><td>1.0억</td><td>1.5억</td><td>1,500만</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="disclaimer">⚠ 위 표는 <b>AI 호황 정점</b> 추정치(블라인드/언론). 평년·불황엔 PS가 크게 줄어 <b>기본급+PI 중심</b>으로 수렴. 신입 <b>고정 기본급은 5,300~5,400만 원대</b>가 현실적. "1인당 평균 6억/12억" 류 기사는 영업이익÷전직원수 단순계산값으로 개인 수령액과 다름.</div>
+
+    <h2 class="sec">복지 · 복리후생 <span style="font-size:12px;color:var(--accent2);font-weight:600">(공식 채용 페이지 기준 · 신뢰도 높음)</span></h2>
+    <div class="grid g2">
+      <div class="card"><h3>🏠 주거</h3>근속 2년↑ 무주택 기혼자에 <b>보증금·임대료 없이 3년 거주</b> 임대아파트 + 주택 구입/임차 자금 일부 지원.
+        <div class="note">근무지 이천/청주/분당 → 실질 가치 큼</div></div>
+      <div class="card"><h3>👶 자녀</h3>유치원·초·중 입학 축하금, <b>중·고·대학생 학자금 100% 실비</b>(입학금·수업료 등), 사내 어린이집(이천·청주·분당).</div>
+      <div class="card"><h3>🏥 의료</h3>본인·가족 의료비 지원, 본인·배우자 <b>종합검진</b>.</div>
+      <div class="card"><h3>🌴 휴가 / 워라밸</h3>연차·경조·창립일 휴무 + <b>“Happy Friday”</b>(금요일 근무시간 유연화/문화활동).</div>
+    </div>
+    <div class="pill-row" style="margin-top:14px">
+      <span class="pill">복지포인트</span><span class="pill">출퇴근 교통비</span><span class="pill">구내식당</span>
+      <span class="pill">신입 웰컴키트</span><span class="pill">개인연금 지원</span><span class="pill">자기계발 지원</span>
+    </div>
+
+    <h2 class="sec">지원 전략과의 연결</h2>
+    <div class="twocol">
+      <div class="card"><h3 style="color:var(--accent)">변동급이 곧 사이클</h3>어느 직무든 성과급(PS)은 <b>회사 전체 영업이익</b>에 연동. 직무별 연봉차보다 사이클이 큰 변수 → <b>워라밸 좋은 직무를 골라도 성과급은 동일</b>. 즉 <b>Track B(Digital Factory)의 기회비용이 거의 없음</b>.</div>
+      <div class="card"><h3 style="color:var(--warn)">이연 구조 체크</h3>첫해엔 PS를 다 못 받으므로, <b>입사 시기 ↔ 첫 PS 산정 시점</b>을 처우 협의 때 확인할 것.</div>
+    </div>
+
+  </section>
+
+  <footer>
+    hy 경력입사 전략 &amp; 보상 대시보드 · 회사명 마스킹(hy) · 보상 수치는 비공식 추정치 ·
+    개인 의사결정 참고용 · 2026-06-30
+  </footer>
+
+</div>
+
+<script>
+  const tabs=document.querySelectorAll('.tab');
+  const views=document.querySelectorAll('.view');
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    views.forEach(v=>v.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.v).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }));
+</script>
+</body>
+</html>
