@@ -68,6 +68,19 @@
   .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:4px 0 14px}
   .legend span b{font-weight:700}
   .strat-track{border-radius:14px;border:1px solid var(--border);padding:18px;background:var(--panel)}
+  /* lock screen */
+  #lock{position:fixed;inset:0;z-index:999;background:radial-gradient(900px 600px at 50% 30%,#15202b,#0d1117);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:24px}
+  #lock .lockbox{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:34px 30px;width:100%;max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+  #lock .lk-logo{width:54px;height:54px;border-radius:14px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;color:#fff;margin:0 auto 14px}
+  #lock h2{font-size:17px;margin-bottom:4px}
+  #lock p{color:var(--muted);font-size:12.5px;margin-bottom:20px}
+  #pin{width:100%;text-align:center;font-size:28px;letter-spacing:14px;padding:12px 0;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);outline:none;font-weight:700}
+  #pin:focus{border-color:var(--accent)}
+  #lock button{margin-top:16px;width:100%;padding:12px;border:none;border-radius:12px;background:var(--grad);color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+  #lkmsg{color:var(--danger);font-size:12.5px;min-height:16px;margin-top:10px}
+  .gate-hidden{display:none !important}
+  body.locked{overflow:hidden}
   .strat-track.A{border-top:3px solid var(--accent2)}
   .strat-track.B{border-top:3px solid var(--accent)}
   .strat-track h4{font-size:15px;margin-bottom:4px}
@@ -75,8 +88,21 @@
   .A .tag{color:var(--accent2)} .B .tag{color:var(--accent)}
 </style>
 </head>
-<body>
-<div class="wrap">
+<body class="locked">
+
+<div id="lock">
+  <div class="lockbox">
+    <div class="lk-logo">hy</div>
+    <h2>잠금 화면</h2>
+    <p>4자리 PIN을 입력하세요</p>
+    <input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"
+      pattern="[0-9]*" placeholder="••••" />
+    <button id="unlock">열기</button>
+    <div id="lkmsg"></div>
+  </div>
+</div>
+
+<div class="wrap gate-hidden">
 
   <header class="top">
     <div class="brand">
@@ -271,6 +297,31 @@
 </div>
 
 <script>
+  /* ---- PIN gate (note: client-side only, not real security) ---- */
+  const PIN="0001";
+  const lock=document.getElementById('lock');
+  const wrap=document.querySelector('.wrap');
+  const pin=document.getElementById('pin');
+  const msg=document.getElementById('lkmsg');
+  function unlock(){
+    if(pin.value===PIN){
+      sessionStorage.setItem('hy_ok','1');
+      lock.classList.add('gate-hidden');
+      wrap.classList.remove('gate-hidden');
+      document.body.classList.remove('locked');
+    }else{
+      msg.textContent="PIN이 올바르지 않습니다.";
+      pin.value="";pin.focus();
+    }
+  }
+  if(sessionStorage.getItem('hy_ok')==='1'){
+    lock.classList.add('gate-hidden');
+    wrap.classList.remove('gate-hidden');
+    document.body.classList.remove('locked');
+  }else{ setTimeout(()=>pin.focus(),100); }
+  document.getElementById('unlock').addEventListener('click',unlock);
+  pin.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+
   const tabs=document.querySelectorAll('.tab');
   const views=document.querySelectorAll('.view');
   tabs.forEach(t=>t.addEventListener('click',()=>{
